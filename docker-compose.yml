@@ -1,0 +1,31 @@
+version: '3.1'
+
+services:
+    bot_app:
+      build:
+        context: .
+        dockerfile: .docker/php-fpm/Dockerfile
+        args:
+          - INSTALL_XDEBUG=false
+      volumes:
+        - ./:/var/www
+      user: "1000:0"
+
+    bot_nginx:
+      build:
+        context: .
+        dockerfile: .docker/nginx/Dockerfile
+      volumes:
+        - ./:/var/www
+      ports:
+        - "8080:80"
+      links:
+        - bot_app
+
+volumes:
+  dbdata:
+
+networks:
+  default:
+    external:
+      name: eduk
