@@ -3,6 +3,8 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Longman\TelegramBot\Telegram;
+use Longman\TelegramBot\TelegramLog;
+use Psr\Log\NullLogger;
 
 class webhookSetCommand extends Command
 {
@@ -12,23 +14,24 @@ class webhookSetCommand extends Command
 
     public function handle()
     {
-      $bot_api_key  = '314940430:AAGuoyLM8BsNf1JL-I8Z_pe_J4l9jBorDWY';
-      $bot_username = 'onomari_bot';
-      $hook_url     = 'https://47de38ed.ngrok.io/question_bot';
+      $bot_api_key  = config('bot.bot_api_key');
+      $bot_username = config('bot.bot_username');
+      $hook_url     = $this->ask('Set webhook url');
 
       try {
+        TelegramLog::initialize(new NullLogger(), new NullLogger());
         // Create Telegram API object
-        // $telegram = new Telegram($bot_api_key, $bot_username);
+        $telegram = new Telegram($bot_api_key, $bot_username);
 
         // Set webhook
         $result = $telegram->setWebhook($hook_url);
-        echo $result;
+
         if ($result->isOk()) {
             echo $result->getDescription();
         }
       } catch (Longman\TelegramBot\Exception\TelegramException $e) {
         // log telegram errors
-        // echo $e->getMessage();
+        echo $e->getMessage();
       }
     }
 }

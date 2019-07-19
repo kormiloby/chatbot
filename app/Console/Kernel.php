@@ -16,6 +16,7 @@ class Kernel extends ConsoleKernel
         //
         Commands\webhookSetCommand::class,
         Commands\webhookUnsetCommand::class,
+        Commands\updateIAmTokenCommand::class,
     ];
 
     /**
@@ -27,5 +28,6 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         //
+        $schedule->command(updateIAmTokenCommand::class)->twiceDaily(1, 13);;
     }
 }

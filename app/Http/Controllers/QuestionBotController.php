@@ -7,13 +7,15 @@ use Longman\TelegramBot\TelegramLog;
 use Longman\TelegramBot\Request as TelegramRequest;
 use Illuminate\Http\Request;
 use Psr\Log\NullLogger;
+use App\Services\VoiceRecognitionService;
+use App\Services\YandexCloudAuth;
 
 class QuestionBotController extends Controller
 {
     //
-    function hook(Request $request) {
-        $bot_api_key  = '314940430:AAGuoyLM8BsNf1JL-I8Z_pe_J4l9jBorDWY';
-        $bot_username = 'onomari_bot';
+    function __invoke(Request $request) {
+        $bot_api_key  = config('bot.bot_api_key');
+        $bot_username = config('bot.bot_username');
 
         try {
             // Create Telegram API object
@@ -28,14 +30,25 @@ class QuestionBotController extends Controller
             $response2 = TelegramRequest::getFile(['file_id' => $voiceMessageFileId]);
                 if ($response2->isOk()) {
                     /** @var File $photo_file */
-                    $photo_file = $response2->getResult();
-                    TelegramRequest::downloadFile($photo_file);
+                    $voice_file = $response2->getResult();
+                    TelegramRequest::downloadFile($voice_file);
                 }
 
-            $result = TelegramRequest::sendMessage([
-                'chat_id' => $request['message']['chat']['id'],
-                'text'    => 'Your utf8 text 😜 ...',
-            ]);
+            $token = YandexCloudAuth::getIAmToken();
+            $folderId = config('yandex.folderId'); # Идентификатор каталога
+            $audioFileName = "/var/www/storage/" . $voice_file->file_path;
+            $response = VoiceRecognitionService::recognize($token, $folderId, $audioFileName);
+            $response = json_decode($response);
+
+            if (isset($response->result)) {
+                $result = TelegramRequest::sendMessage([
+                    'chat_id' => $request['message']['chat']['id'],
+                    'text'    => $response->result,
+                ]);
+            }
+
+            return json_encode($response);
+
         } catch (Longman\TelegramBot\Exception\TelegramException $e) {
             // Silence is golden!
             // log telegram errors

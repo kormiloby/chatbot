@@ -9,6 +9,7 @@ RUN apt-get install -y \
         libmcrypt-dev \
         libpng-dev \
         libcurl3-dev \
+        libgmp-dev \
         git \
         zip \
         unzip \
@@ -16,7 +17,7 @@ RUN apt-get install -y \
     && docker-php-ext-configure gd --with-jpeg-dir=/usr/include/ \
     && docker-php-ext-install -j$(nproc) gd
 
-RUN docker-php-ext-install -j$(nproc) mbstring tokenizer mysqli pdo_mysql exif curl
+RUN docker-php-ext-install -j$(nproc) mbstring tokenizer mysqli pdo_mysql exif curl gmp
 
 #####################################
 # Composer:

@@ -15,4 +15,4 @@ $router->get('/', function () use ($router) {
     return $router->app->version();
 });
 
-$router->post('/question_bot', 'QuestionBotController@hook');
+$router->post('/', 'QuestionBotController');
