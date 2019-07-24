@@ -28,11 +28,11 @@ class QuestionBotController extends Controller
             // echo $telegram->update->getUpdateType();
             $voiceMessageFileId = $request['message']['voice']['file_id'];
             $response2 = TelegramRequest::getFile(['file_id' => $voiceMessageFileId]);
-                if ($response2->isOk()) {
-                    /** @var File $photo_file */
-                    $voice_file = $response2->getResult();
-                    TelegramRequest::downloadFile($voice_file);
-                }
+
+            if ($response2->isOk()) {
+                $voice_file = $response2->getResult();
+                TelegramRequest::downloadFile($voice_file);
+            }
 
             $token = YandexCloudAuth::getIAmToken();
             $folderId = config('yandex.folderId'); # Идентификатор каталога
