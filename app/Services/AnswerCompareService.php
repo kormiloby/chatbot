@@ -9,14 +9,14 @@ class AnswerCompareService
 
     private $subtokenLenght = 3;
 
-    private $thresholdSentence = 0.25;
+    private $thresholdSentence = 0.5;
 
     private $thresholdWord = 0.45;
 
     /**
     *
     */
-    public function calculateFuzzyEqualValue(string $first, string $second): bool
+    public function calculateFuzzyEqualValue(string $first, string $second)
     {
         if (is_null($first) && is_null($second)) {
             return 1.0;
@@ -40,7 +40,7 @@ class AnswerCompareService
 
         $resultValue = (1.0 * $equalCount) / ($firstCount + $secondCount - $equalCount);
 
-        return $resultValue;
+        return $this->thresholdSentence <= $resultValue;
     }
 
     /**
@@ -73,9 +73,9 @@ class AnswerCompareService
     {
         $equalSubtokenCount = 0;
         $usedTokens = [];
-        for ($i = 0; $i <= strlen($firstToken) - $subtokenLenght + 1; $i++) {
+        for ($i = 0; $i <= strlen($firstToken) - $this->subtokenLenght + 1; $i++) {
             $subtokenFirst = substr($firstToken, $i, $this->subtokenLenght);
-            for ($j = 0; $j <= strlen($secondToken) - $subtokenLenght; $j++) {
+            for ($j = 0; $j <= strlen($secondToken) - $this->subtokenLenght; $j++) {
                 if (!isset($usedTokens[$j])) {
                     $subtokenSecond = substr($secondToken, $j, $this->subtokenLenght);
                     if (!strcmp($subtokenFirst, $subtokenSecond)) {
@@ -87,8 +87,8 @@ class AnswerCompareService
             }
         }
 
-        $subtokenFirstCount = strlen($firstToken) - $subtokenLenght + 1;
-        $subtokenSecondCount = strlen($secondToken) - $subtokenLenght + 1;
+        $subtokenFirstCount = strlen($firstToken) - $this->subtokenLenght + 1;
+        $subtokenSecondCount = strlen($secondToken) - $this->subtokenLenght + 1;
 
         $tanimoto = (1.0 * $equalSubtokenCount) / ($subtokenFirstCount + $subtokenSecondCount - $equalSubtokenCount);
 
@@ -98,7 +98,7 @@ class AnswerCompareService
     /**
     *
     */
-    private function getToken(String $sentense): array
+    private function getToken(String $sentence): array
     {
         $tokens = [];
         $words = explode(" ", $sentence);

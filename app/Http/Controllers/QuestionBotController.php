@@ -9,6 +9,8 @@ use Illuminate\Http\Request;
 use Psr\Log\NullLogger;
 use App\Services\VoiceRecognitionService;
 use App\Services\YandexCloudAuth;
+use App\Services\AnswerCompareService;
+use App\Services\MessageProcessorService\MessageProcessorBuilder;
 
 class QuestionBotController extends Controller
 {
@@ -17,37 +19,23 @@ class QuestionBotController extends Controller
         $bot_api_key  = config('bot.bot_api_key');
         $bot_username = config('bot.bot_username');
 
+        $commands_paths = [
+             '/var/www/app/Console/Commands/Telegram/',
+          ];
+
         try {
             // Create Telegram API object
             $telegram = new Telegram($bot_api_key, $bot_username);
             $telegram->setDownloadPath('/var/www/storage');
             TelegramLog::initialize(new NullLogger(), new NullLogger());
-
+            $telegram->addCommandsPaths($commands_paths);
             // Handle telegram webhook request
             $telegram->handle();
-            // echo $telegram->update->getUpdateType();
-            $voiceMessageFileId = $request['message']['voice']['file_id'];
-            $response2 = TelegramRequest::getFile(['file_id' => $voiceMessageFileId]);
 
-            if ($response2->isOk()) {
-                $voice_file = $response2->getResult();
-                TelegramRequest::downloadFile($voice_file);
-            }
+            $messageProcessor = MessageProcessorBuilder::getMessageProcessorInstance($telegram);
+            $messageProcessor->process();
 
-            $token = YandexCloudAuth::getIAmToken();
-            $folderId = config('yandex.folderId'); # Идентификатор каталога
-            $audioFileName = "/var/www/storage/" . $voice_file->file_path;
-            $response = VoiceRecognitionService::recognize($token, $folderId, $audioFileName);
-            $response = json_decode($response);
-
-            if (isset($response->result)) {
-                $result = TelegramRequest::sendMessage([
-                    'chat_id' => $request['message']['chat']['id'],
-                    'text'    => $response->result,
-                ]);
-            }
-
-            return json_encode($response);
+            return 200;
 
         } catch (Longman\TelegramBot\Exception\TelegramException $e) {
             // Silence is golden!
