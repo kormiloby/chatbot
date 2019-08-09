@@ -43,7 +43,7 @@ class VoiceMessageProcessor extends MessageProcessor
 
         $token = YandexCloudAuth::getIAmToken();
         $folderId = config('yandex.folderId'); # Идентификатор каталога
-        $audioFileName = "/var/www/storage/" . $voiceFile->file_path;
+        $audioFileName = base_path("storage/") . $voiceFile->file_path;
         $responseRecognitionService = VoiceRecognitionService::recognize($token, $folderId, $audioFileName);
 
         $responseRecognitionService = json_decode($responseRecognitionService);
@@ -76,11 +76,13 @@ class VoiceMessageProcessor extends MessageProcessor
                     'text'    => 'Правильно',
                 ]);
 
+                event(new MessageProcessEvent($responseRecognitionService->result, $questions['text'], 'Правильно'));
+
                 return $result;
             }
         }
 
-        event(new MessageProcessEvent($responseRecognitionService->result, $questions['text']));
+        event(new MessageProcessEvent($responseRecognitionService->result, $questions['text'], 'Неправильно'));
 
         $result = Request::sendMessage([
             'chat_id' => $chatId,

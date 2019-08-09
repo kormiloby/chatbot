@@ -9,3 +9,4 @@ Homestead.yaml
 /storage/iamtoken.key
 .index.php
 .ftpconfig
+/web

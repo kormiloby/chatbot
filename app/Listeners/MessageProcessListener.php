@@ -36,8 +36,10 @@ class MessageProcessListener
         }
 
         $data[] = [
-            'question' => $event->question,
-            'answer' =>  $event->answer
+            'question'  => $event->question,
+            'answer'    => $event->answer,
+            'status'    => $event->status,
+            'date'      => date('m/d/Y h:i:s a', time())
         ];
 
         $newJsonString = json_encode($data, JSON_UNESCAPED_UNICODE);

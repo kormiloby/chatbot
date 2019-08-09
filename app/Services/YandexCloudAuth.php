@@ -38,7 +38,7 @@ class YandexCloudAuth
           'kid' => $key_id
         ];
 
-        $key = JWKFactory::createFromKeyFile('/var/www/storage/private.pem');
+        $key = JWKFactory::createFromKeyFile(base_path('storage/private.pem'));
 
         $payload = $jsonConverter->encode($claims);
 
@@ -83,6 +83,6 @@ class YandexCloudAuth
 
     public static function getIAmToken()
     {
-        return json_decode(file_get_contents('/var/www/storage/iamtoken.key'))->iamToken;
+        return json_decode(file_get_contents(base_path('storage/iamtoken.key')))->iamToken;
     }
 }

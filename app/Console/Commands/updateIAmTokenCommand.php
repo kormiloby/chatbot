@@ -15,6 +15,6 @@ class updateIAmTokenCommand extends Command
 
     public function handle()
     {
-        file_put_contents('/var/www/storage/iamtoken.key', YandexCloudAuth::updateIAmToken());
+        file_put_contents(base_path('storage/iamtoken.key'), YandexCloudAuth::updateIAmToken());
     }
 }
