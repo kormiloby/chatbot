@@ -40,7 +40,7 @@ class AnswerCompareService
 
         $resultValue = (1.0 * $equalCount) / ($firstCount + $secondCount - $equalCount);
 
-        return $this->thresholdSentence <= $resultValue;
+        return $this->thresholdSentence < $resultValue;
     }
 
     /**

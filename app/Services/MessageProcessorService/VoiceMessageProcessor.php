@@ -9,6 +9,7 @@ use App\Services\VoiceRecognitionService;
 use App\Services\YandexCloudAuth;
 use App\Services\QuestionService;
 use App\Services\AnswerCompareService;
+use App\Events\MessageProcessEvent;
 
 /**
  *
@@ -43,9 +44,11 @@ class VoiceMessageProcessor extends MessageProcessor
         $token = YandexCloudAuth::getIAmToken();
         $folderId = config('yandex.folderId'); # Идентификатор каталога
         $audioFileName = "/var/www/storage/" . $voiceFile->file_path;
-        $response = VoiceRecognitionService::recognize($token, $folderId, $audioFileName);
+        $responseRecognitionService = VoiceRecognitionService::recognize($token, $folderId, $audioFileName);
 
-        if ($response == false) {
+        $responseRecognitionService = json_decode($responseRecognitionService);
+
+        if (!isset($responseRecognitionService->result)) {
           $result = Request::sendMessage([
               'chat_id' => $chatId,
               'text'    => 'Сообщение не распознано',
@@ -54,8 +57,6 @@ class VoiceMessageProcessor extends MessageProcessor
           return $result;
         }
 
-        $response = json_decode($response);
-
         $questionId = $question->question_id;
         $questions = QuestionService::getQusetion($questionId);
         $comparator = new AnswerCompareService();
@@ -63,8 +64,13 @@ class VoiceMessageProcessor extends MessageProcessor
         $question->status = 'close';
         $question->save();
 
+        $result = Request::sendMessage([
+            'chat_id' => $chatId,
+            'text'    => 'Ваш ответ: "' . $responseRecognitionService->result . '"',
+        ]);
+
         foreach( $questions['answer'] as $answer) {
-            if ($comparator->calculateFuzzyEqualValue($response->result, $answer)) {
+            if ($comparator->calculateFuzzyEqualValue($responseRecognitionService->result, $answer)) {
                 $result = Request::sendMessage([
                     'chat_id' => $chatId,
                     'text'    => 'Правильно',
@@ -74,9 +80,11 @@ class VoiceMessageProcessor extends MessageProcessor
             }
         }
 
+        event(new MessageProcessEvent($responseRecognitionService->result, $questions['text']));
+
         $result = Request::sendMessage([
             'chat_id' => $chatId,
-            'text'    => 'Невправильно',
+            'text'    => 'Неправильно',
         ]);
 
         return $result;

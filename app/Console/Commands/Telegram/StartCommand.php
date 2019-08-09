@@ -52,7 +52,19 @@ class StartCommand extends SystemCommand
         $questionId = $question['id'];
         $text = $question['text'];
 
-        $flight = Question::create([
+        $oldQuestions = Question::where([
+          'chat_id' => $chat_id,
+          'status' => 'open'
+          ])->get();
+
+        if (count($oldQuestions) > 0) {
+          foreach ($oldQuestions as $question) {
+              $question->status = 'close';
+              $question->save();
+          }
+        }
+
+        Question::create([
             'status'      => 'open',
             'question_id' => $questionId,
             'chat_id'     => $chat_id

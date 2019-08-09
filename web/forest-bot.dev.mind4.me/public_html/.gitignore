@@ -7,5 +7,4 @@ Homestead.yaml
 /storage/voice
 /storage/private.pem
 /storage/iamtoken.key
-.index.php
-.ftpconfig
+index.php
