@@ -22,4 +22,4 @@
   Команды обрабатываются с помощью классов в директории app/Console/Commands/Telegram. Название класса соответствует названию команды.
 
 ### Обработка команды `/start`
-  
+  Команда `/start` обрабатывается классом app/Console/Commands/Telegram/StartCommand.php. Класс  получает случайный вопрос с помощью статического метода `QuestionService::getQusetion()`.  
