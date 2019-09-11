@@ -93,11 +93,7 @@ class VoiceMessageProcessor extends MessageProcessor
 
         Request::sendMessage([
             'chat_id' => $chatId,
-<<<<<<< HEAD
-            'text'    => 'Вариант ответа: ' . $questions['answer'][0],
-=======
             'text'    => 'Вариант ответа: ' . $questions->ANSWERS[0],
->>>>>>> 143c48a8b56f340bec8a06e87159ded130209f48
         ]);
 
         return $result;
