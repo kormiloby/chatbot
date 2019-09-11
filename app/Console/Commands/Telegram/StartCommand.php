@@ -45,9 +45,9 @@ class StartCommand extends SystemCommand
         $message = $this->getMessage();
         $chat_id = $message->getChat()->getId();
 
-        // if (!AuthBotUserService::isAuth($chat_id)) {
-        //     throw new TelegramAuthException('Вы не авторизованы. Для авторизации оправте id в CRM системе.');
-        // }
+        if (!AuthBotUserService::isAuth($chat_id)) {
+            throw new TelegramAuthException('Вы не авторизованы. Для авторизации оправте id в CRM системе.');
+        }
 
         $question = QuestionService::getQusetion();
 

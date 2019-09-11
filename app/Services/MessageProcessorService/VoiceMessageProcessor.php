@@ -10,6 +10,8 @@ use App\Services\YandexCloudAuth;
 use App\Services\QuestionService;
 use App\Services\AnswerCompareService;
 use App\Events\MessageProcessEvent;
+use App\Services\AmmoCrmService;
+use App\AuthUsers;
 
 /**
  *
@@ -77,6 +79,10 @@ class VoiceMessageProcessor extends MessageProcessor
                     'chat_id' => $chatId,
                     'text'    => 'Правильно',
                 ]);
+
+                $user = AuthUsers::where('chat_id', $chatId)->first();
+
+                AmmoCrmService::sendResult($user->cms_user_id, $questionId, 'true', $responseRecognitionService->result);
 
                 event(new MessageProcessEvent($responseRecognitionService->result, $questions->QUESTION, 'Правильно'));
 
