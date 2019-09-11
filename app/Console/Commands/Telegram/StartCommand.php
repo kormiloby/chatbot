@@ -5,6 +5,8 @@ use Longman\TelegramBot\Commands\SystemCommand;
 use Longman\TelegramBot\Request;
 use App\Services\QuestionService;
 use App\Question;
+use App\Services\AuthBotUserService;
+use App\Exceptions\TelegramAuthException;
 /**
  * Start command
  *
@@ -43,14 +45,18 @@ class StartCommand extends SystemCommand
         $message = $this->getMessage();
         $chat_id = $message->getChat()->getId();
 
+        // if (!AuthBotUserService::isAuth($chat_id)) {
+        //     throw new TelegramAuthException('Вы не авторизованы. Для авторизации оправте id в CRM системе.');
+        // }
+
         $question = QuestionService::getQusetion();
 
-        if (!isset($question['id']) || !isset($question['text'])) {
+        if (!isset($question->ID) || !isset($question->QUESTION)) {
             return false;
         }
 
-        $questionId = $question['id'];
-        $text = $question['text'];
+        $questionId = $question->ID;
+        $text = $question->QUESTION;
 
         $oldQuestions = Question::where([
           'chat_id' => $chat_id,

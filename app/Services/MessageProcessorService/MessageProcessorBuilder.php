@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Services\MessageProcessorService;
 
 use Longman\TelegramBot\Telegram;
+use App\Services\AuthBotUserService;
 
 /**
  *
@@ -22,7 +23,9 @@ class MessageProcessorBuilder
 
         $className = self::getProcessorClassName($input->message);
 
-        $processorInsatance = new $className($telegram);
+        $authSevice = new AuthBotUserService();
+
+        $processorInsatance = new $className($telegram, $authSevice);
 
         return $processorInsatance;
     }

@@ -19,6 +19,7 @@ class VoiceMessageProcessor extends MessageProcessor
     public function process()
     {
         $chatId = $this->messageData->message->chat->id;
+
         $question = Question::where([
           'chat_id' => $chatId,
           'status' => 'open'
@@ -58,7 +59,8 @@ class VoiceMessageProcessor extends MessageProcessor
         }
 
         $questionId = $question->question_id;
-        $questions = QuestionService::getQusetion($questionId);
+
+        $questions = QuestionService::getAnswers($questionId);
         $comparator = new AnswerCompareService();
 
         $question->status = 'close';
@@ -69,20 +71,20 @@ class VoiceMessageProcessor extends MessageProcessor
             'text'    => 'Ваш ответ: "' . $responseRecognitionService->result . '"',
         ]);
 
-        foreach( $questions['answer'] as $answer) {
+        foreach( $questions->ANSWERS as $answer) {
             if ($comparator->calculateFuzzyEqualValue($responseRecognitionService->result, $answer)) {
                 $result = Request::sendMessage([
                     'chat_id' => $chatId,
                     'text'    => 'Правильно',
                 ]);
 
-                event(new MessageProcessEvent($responseRecognitionService->result, $questions['text'], 'Правильно'));
+                event(new MessageProcessEvent($responseRecognitionService->result, $questions->QUESTION, 'Правильно'));
 
                 return $result;
             }
         }
 
-        event(new MessageProcessEvent($responseRecognitionService->result, $questions['text'], 'Неправильно'));
+        event(new MessageProcessEvent($responseRecognitionService->result, $questions->QUESTION, 'Неправильно'));
 
         $result = Request::sendMessage([
             'chat_id' => $chatId,
@@ -91,7 +93,11 @@ class VoiceMessageProcessor extends MessageProcessor
 
         Request::sendMessage([
             'chat_id' => $chatId,
+<<<<<<< HEAD
             'text'    => 'Вариант ответа: ' . $questions['answer'][0],
+=======
+            'text'    => 'Вариант ответа: ' . $questions->ANSWERS[0],
+>>>>>>> 143c48a8b56f340bec8a06e87159ded130209f48
         ]);
 
         return $result;
