@@ -73,14 +73,15 @@ class VoiceMessageProcessor extends MessageProcessor
             'text'    => 'Ваш ответ: "' . $responseRecognitionService->result . '"',
         ]);
 
+        $user = AuthUsers::where('chat_id', $chatId)->first();
+
         foreach( $questions->ANSWERS as $answer) {
             if ($comparator->calculateFuzzyEqualValue($responseRecognitionService->result, $answer)) {
+
                 $result = Request::sendMessage([
                     'chat_id' => $chatId,
                     'text'    => 'Правильно',
                 ]);
-
-                $user = AuthUsers::where('chat_id', $chatId)->first();
 
                 AmmoCrmService::sendResult($user->cms_user_id, $questionId, 1, $responseRecognitionService->result);
 
