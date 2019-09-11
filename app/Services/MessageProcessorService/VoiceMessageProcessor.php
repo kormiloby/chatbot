@@ -89,6 +89,11 @@ class VoiceMessageProcessor extends MessageProcessor
             'text'    => 'Неправильно',
         ]);
 
+        Request::sendMessage([
+            'chat_id' => $chatId,
+            'text'    => 'Вариант ответа: ' . $questions['answer'][0],
+        ]);
+
         return $result;
     }
 }
