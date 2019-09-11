@@ -82,7 +82,7 @@ class VoiceMessageProcessor extends MessageProcessor
 
                 $user = AuthUsers::where('chat_id', $chatId)->first();
 
-                AmmoCrmService::sendResult($user->cms_user_id, $questionId, 'true', $responseRecognitionService->result);
+                AmmoCrmService::sendResult($user->cms_user_id, $questionId, 1, $responseRecognitionService->result);
 
                 event(new MessageProcessEvent($responseRecognitionService->result, $questions->QUESTION, 'Правильно'));
 
@@ -96,6 +96,8 @@ class VoiceMessageProcessor extends MessageProcessor
             'chat_id' => $chatId,
             'text'    => 'Неправильно',
         ]);
+
+        AmmoCrmService::sendResult($user->cms_user_id, $questionId, 0, $responseRecognitionService->result);
 
         Request::sendMessage([
             'chat_id' => $chatId,

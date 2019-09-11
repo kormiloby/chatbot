@@ -45,7 +45,7 @@ class AuthBotUserService
 
             $authUser->save();
 
-            throw new TelegramAuthException("Вы авторизовались. Можете начать работу с помощью еоманды /start .");
+            throw new TelegramAuthException("Вы авторизовались. Можете начать работу с помощью команды /start .");
         };
 
     }
