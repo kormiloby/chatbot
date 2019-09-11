@@ -8,6 +8,7 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Laravel\Lumen\Exceptions\Handler as ExceptionHandler;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use App\Exceptions\TelegramAuthException;
 
 class Handler extends ExceptionHandler
 {
@@ -21,6 +22,7 @@ class Handler extends ExceptionHandler
         HttpException::class,
         ModelNotFoundException::class,
         ValidationException::class,
+        TelegramAuthException::class
     ];
 
     /**
@@ -33,6 +35,9 @@ class Handler extends ExceptionHandler
      */
     public function report(Exception $exception)
     {
+        if ($exception instanceof \App\Exceptions\TelegramAuthException)  {
+            $exception->report(160547574);
+        }
         parent::report($exception);
     }
 
@@ -45,6 +50,9 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $exception)
     {
+        if ($exception instanceof \App\Exceptions\TelegramAuthException)  {
+            return $exception->render($request);
+        }
         return parent::render($request, $exception);
     }
 }
