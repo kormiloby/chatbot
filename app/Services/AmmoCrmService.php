@@ -5,23 +5,37 @@ use GuzzleHttp\Client;
 
 class AmmoCrmService
 {
-    public static function checkUserId($userId) {
-        $jsonString = file_get_contents(base_path('storage/crm_id.txt'));
-        $data = json_decode($jsonString, true);
 
-        foreach ($data as $id) {
-            if ($id == $userId) {
-                return true;
-            }
+    public static function checkUserId($userId) {
+        $crmHost = config('crm.host');
+
+        $crmApiKey = config('crm.api_key');
+
+        $client = new Client();
+
+        $apiUrl = $crmHost . "/rest/2525/" . $crmApiKey . "/bot.getbyid?USER_ID=" . $userId;
+
+        $response = $client->request('GET', $apiUrl);
+
+        $body = $response->getBody();
+        $content = json_decode($body->getContents());
+
+        if ($content->result->status === 'success') {
+            return true;
+
         }
 
-        return true;
+        return false;
     }
 
     public static function sendResult($userId, $questionId, $note, $answerText) {
+        $crmHost = config('crm.host');
+
+        $crmApiKey = config('crm.api_key');
+
         $client = new Client();
 
-        $response = $client->request('GET', "https://crmtest.for-est.ru/rest/2525/hly9vv9jbexm9inm/bot.setanswer?USER_ID=$userId&QUESTION_ID=$questionId&NOTE=$note&ANSWER_TEXT=$answerText");
+        $response = $client->request('GET', $crmHost . "/rest/2525/". $crmApiKey ."/bot.setanswer?USER_ID=$userId&QUESTION_ID=$questionId&NOTE=$note&ANSWER_TEXT=$answerText");
 
         $body = $response->getBody();
         $content = json_decode($body->getContents());
