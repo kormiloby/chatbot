@@ -4,7 +4,7 @@ namespace App\Services;
 
 class VoiceRecognitionService
 {
-    public static function recognize($token, $folderId, $audioFileName)
+    public static function recognize($folderId, $audioFileName)
     {
         $apiKey = config('yandex.api_key');
 

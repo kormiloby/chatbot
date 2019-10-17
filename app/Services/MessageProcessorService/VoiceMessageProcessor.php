@@ -44,10 +44,9 @@ class VoiceMessageProcessor extends MessageProcessor
             Request::downloadFile($voiceFile);
         }
 
-        $token = YandexCloudAuth::getIAmToken();
         $folderId = config('yandex.folderId'); # Идентификатор каталога
         $audioFileName = base_path("storage/") . $voiceFile->file_path;
-        $responseRecognitionService = VoiceRecognitionService::recognize($token, $folderId, $audioFileName);
+        $responseRecognitionService = VoiceRecognitionService::recognize($folderId, $audioFileName);
 
         $responseRecognitionService = json_decode($responseRecognitionService);
 
